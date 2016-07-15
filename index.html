@@ -1,1 +1,162 @@
-hello
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>jump</title>
+		<link rel="stylesheet" href="jump.css"/>
+		<script tpye="text/javascript" src="jquery-1.8.3.js"/></script>
+	</head>
+	<body>
+	<div class="demo xfast">
+		<div class="scoreBest"></div>
+		<div class="scoreText"></div>
+		<div class="overText" style="display:none;"></div>
+		<div class="overIcon" style="display:none;"></div>
+	    <div class="monster wait"></div>
+	    <div class="way" style="display:none;"> 
+			<ul class="wayul1"> 
+				<li class="wayli1"> 
+		      		<ul class="wayul2"> 
+						<li><img src="./images/bg1.png" /></li>
+						<li><img src="./images/bg2.png" /></li> 
+						<li><img src="./images/bg3.png" /></li> 
+					</ul> 
+				<li class="wayli2"></li> 
+			</ul> 
+		</div> 
+		<div class="plantway" style="display:none;">
+			<img class="plant1" src="./images/plant1.png" />
+			<img class="plant2" src="./images/plant2.png" />
+			<img class="plant3" src="./images/plant3.png" />
+			<img class="plant4" src="./images/plant4.png" />
+		</div>
+	</div>
+	<script type="text/javascript"> 
+
+	//游戏开始: 1：准备开始 2：跳跃触发游戏 3：背景植物移动
+	//遇到植物：1：恐龙跳跃 2：判断是否跳过
+	//未跳过：1：背景植物停止 2：游戏结束
+
+
+	$(function(){
+		//主函数
+		var mon = $(".monster"); 
+		document.onkeydown = function(event){ 
+	    	e = event ? event :(window.event ? window.event : null); 
+	    	if(e.keyCode == 32){
+	    		up();     //跳跃触发游戏
+	    		startTime();     //计时开始
+				play();     //游戏主体      
+	    	}
+		};
+
+		//游戏主体
+		function play(){
+			$(".way").show();
+			$(".plantway").show();
+			mon.removeClass("wait");     //恐龙植物移动
+    		mon.addClass("run");
+			plantMove($(".plant1"));
+		    plantMove($(".plant2"));
+		    plantMove($(".plant3"));
+		    plantMove($(".plant4"));
+		    var bging = setInterval(MarqueeBg,5);
+			document.onkeydown = function(event){ 
+		    	e = event ? event :(window.event ? window.event : null); 
+		    	if(e.keyCode == 32){ 
+		    		up();
+		        }     
+		    };
+		    $(document).click(function(){
+				clearInterval(bging);
+				document.onkeydown = function(event){ 
+			    	e = event ? event :(window.event ? window.event : null); 
+			    	if(e.keyCode == 32){ 
+			    		up();
+			    		mon.removeClass("over"); 
+    					mon.addClass("run");
+    					$(".overText").hide();
+		    			$(".overIcon").hide();
+			    		play();
+			    		startTime();
+			        }     
+			    };
+			});
+		};
+
+		//开始计时
+		function startTime(){
+			var sec = 0;       
+			var t = setInterval(function clock(){
+				sec ++;
+				var secLen = sec.toString().length;
+				switch(secLen){
+					case 1:sec = "0000"+sec;
+					break;
+					case 2:sec = "000"+sec;
+					break;
+					case 3:sec = "00"+sec;
+					break;
+					case 4:sec = "0"+sec;
+					break;
+					default:sec = sec;
+				}
+				$(".scoreText").html(sec);
+			},100);
+			$(document).click(function(){
+				clearInterval(t);
+				$(".overText").show();
+		    	$(".overIcon").show();
+		    	mon.addClass("over");     
+		    	mon.removeClass("run");
+		    	$(".scoreBest").html("HI    " + sec);
+			});
+		};
+
+		
+		//恐龙跳跃
+		function up(){
+			$(".monster").addClass("fly");
+    		$(".monster").animate({
+    			top:"-20px"
+    		},250,function(){
+    			$(".monster").animate({
+    				top:"60px"
+    			},300,function(){
+    				$(".monster").removeClass("fly");
+    			});
+    		}),1000;
+		};
+
+	    //背景移动
+		$(".wayli2").html($(".wayli1").html());
+		function MarqueeBg(){
+			if($(".way").scrollLeft() >= $(".wayli1").width())
+				$(".way").scrollLeft(0);
+			else{
+				$(".way").scrollLeft($(".way").scrollLeft() + 1);
+			}
+		};
+		
+	    //植物移动
+	    function plantMove(elm) {
+	    	var value = parseInt(elm.css("left").slice(0,-2));
+			var planting = setInterval(function MarqueePl(){
+				if(value == 0){
+					value = 2000 + value*Math.random()*1000;
+				}else{
+					value = value - 1;
+				}
+				var leftValue = value + "px";
+				elm.css("left",leftValue);
+			},5)
+			$(document).click(function(){
+				clearInterval(planting);
+			});
+	    };	 
+ 
+	})
+	    
+	</script>
+	</body>
+</html>
